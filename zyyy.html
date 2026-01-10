@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WA BADAK PRO</title>  
+  <!-- Font Awesome 7.0.1 -->  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />  
+  <!-- Google Font -->  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">  
+  <style>
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.4);
+      --primary: #00c853;
+      --primary-dark: #128C7E;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --dark: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      animation: bgMove 10s ease infinite alternate;
+      padding-bottom: 70px; /* Space untuk bottom nav */
+    }
+
+    @keyframes bgMove {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(25deg); }
+    }
+
+    /* Container utama */
+    .container {
+      display: none;
+      padding: 20px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .container.active {
+      display: block;
+      animation: fadeUp 0.5s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Card style */
+    .card {
+      width: 100%;
+      padding: 28px;
+      border-radius: 26px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+      margin-bottom: 20px;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header i {
+      font-size: 48px;
+      color: #25d366;
+      filter: drop-shadow(0 0 10px rgba(37, 211, 102, 0.6));
+    }
+
+    .header h1 {
+      margin: 12px 0 6px;
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 14px;
+      color: rgba(255,255,255,0.85);
+    }
+
+    /* STATS SECTION - HOME PAGE */
+    .stats-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-card.badak {
+      border-top: 4px solid #25d366;
+    }
+
+    .stat-card.nonbadak {
+      border-top: 4px solid #ef4444;
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card.badak .stat-icon {
+      color: #25d366;
+    }
+
+    .stat-card.nonbadak .stat-icon {
+      color: #ef4444;
+    }
+
+    .stat-title {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      color: white;
+      margin: 5px 0;
+    }
+
+    .stat-subtitle {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* BROADCAST GUIDE - HOME PAGE */
+    .guide-section {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .guide-title {
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .guide-title i {
+      color: #25d366;
+    }
+
+    .guide-content {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .guide-content ol {
+      padding-left: 20px;
+      margin: 15px 0;
+    }
+
+    .guide-content li {
+      margin-bottom: 10px;
+    }
+
+    .guide-content strong {
+      color: white;
+    }
+
+    /* BADAK PAGE - INPUT & BUTTON */
+    .input-group {
+      margin-top: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .phone-input {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 14px;
+      padding: 12px 14px;
+      transition: all 0.3s ease;
+    }
+
+    .phone-input:focus-within {
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 0 0 3px rgba(37,211,102,0.25);
+    }
+
+    .prefix {
+      font-weight: 600;
+      margin-right: 8px;
+      color: white;
+    }
+
+    .phone-input input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      color: white;
+    }
+
+    .phone-input input::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+
+    .btn {
+      margin-top: 26px;
+      width: 100%;
+      padding: 16px;
+      border-radius: 18px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #25d366, #00c853);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 12px 30px rgba(0, 200, 83, 0.45);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 8px 18px rgba(0, 200, 83, 0.35);
+      opacity: 0.9;
+    }
+
+    .btn:disabled {
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 18px 40px rgba(0, 200, 83, 0.6);
+    }
+
+    /* EXPIRED INFO */
+    .expired-info {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 14px;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .expired-info i {
+      color: #f59e0b;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .expired-text {
+      color: white;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .expired-timer {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f59e0b;
+      font-family: monospace;
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      padding: 12px 0;
+      z-index: 1000;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+    }
+
+    .nav-item.active {
+      color: white;
+      transform: translateY(-5px);
+    }
+
+    .nav-item.active .nav-icon {
+      color: #25d366;
+      transform: scale(1.2);
+    }
+
+    .nav-icon {
+      font-size: 22px;
+      margin-bottom: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-label {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* MODAL STYLES (SAMA DENGAN SEBELUMNYA) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      width: 90%;
+      max-width: 400px;
+      background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      animation: modalSlide 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #25d366, #00c853, #25d366);
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .modal-header i {
+      font-size: 50px;
+      color: #25d366;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 15px rgba(37, 211, 102, 0.7));
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .modal-header h2 {
+      color: white;
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(45deg, #25d366, #00c853);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-header p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .features-list {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .feature-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(37, 211, 102, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #25d366;
+      font-size: 16px;
+    }
+
+    .feature-text {
+      flex: 1;
+    }
+
+    .feature-name {
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 3px;
+    }
+
+    .feature-status {
+      color: #25d366;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #25d366, #00c853);
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(37, 211, 102, 0.4);
+    }
+
+    .modal-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .badak-code {
+      text-align: center;
+      margin: 15px 0;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      border: 1px dashed rgba(37, 211, 102, 0.5);
+    }
+
+    .badak-code span {
+      font-family: monospace;
+      color: #25d366;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    /* EXPIRY INFO IN MODAL */
+    .expiry-info {
+      background: rgba(245, 158, 11, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: center;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .expiry-info i {
+      color: #f59e0b;
+      margin-right: 8px;
+    }
+
+    .expiry-text {
+      color: #f59e0b;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .admin-contact {
+      background: rgba(37, 211, 102, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .admin-contact a {
+      color: #25d366;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-contact a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>  
+  <!-- HOME PAGE -->
+  <div id="homePage" class="container active">
+    <div class="card">
+      <div class="header">
+        <i class="fa-brands fa-whatsapp"></i>
+        <h1>WA BADAK DASHBOARD</h1>
+        <p>Monitor & Kelola Nomor Badak Anda</p>
+      </div>
+
+      <div class="stats-container">
+        <div class="stat-card badak">
+          <div class="stat-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="stat-title">BADAK</div>
+          <div id="totalBadak" class="stat-number">0</div>
+          <div class="stat-subtitle">Nomor Aktif</div>
+        </div>
+
+        <div class="stat-card nonbadak">
+          <div class="stat-icon">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="stat-title">NONBADAK</div>
+          <div id="totalNonBadak" class="stat-number">0</div>
+          <div class="stat-subtitle">Expired</div>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-title">
+          <i class="fas fa-bullhorn"></i>
+          <span>Broadcast Panduan Cara</span>
+        </div>
+        <div class="guide-content">
+          <ol>
+            <li><strong>Masukkan nomor WhatsApp</strong> di halaman Badak</li>
+            <li><strong>Klik GAS BADAK</strong> untuk aktivasi fitur</li>
+            <li><strong>Fitur aktif selama 24 jam</strong> sejak aktivasi</li>
+            <li><strong>Renew sebelum expired</strong> ke admin WhatsApp</li>
+            <li><strong>Gunakan dengan bijak</strong> untuk menghindari block</li>
+          </ol>
+          <p>Setelah expired, nomor akan otomatis akan NONBADAK.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BADAK PAGE -->
+  <div id="badakPage" class="container">
+    <div class="card">
+      <div class="header">
+        <i class="fa-brands fa-whatsapp"></i>
+        <h1>WA BADAK ACTIVATOR</h1>
+        <p>Aktifkan Fitur Badak untuk Nomor Anda</p>
+      </div>
+
+      <div class="input-group">
+        <label>Nomor WhatsApp (Internasional)</label>
+        <div class="phone-input">
+          <span class="prefix">+62</span>
+          <input id="phone" type="number" placeholder="812xxxxxxx" />
+        </div>
+      </div>
+
+      <div class="expired-info">
+        <i class="fas fa-clock"></i>
+        <div class="expired-text">Masa Aktif Badak:</div>
+        <div id="expiredTimer" class="expired-timer">24:00:00</div>
+        <div class="expired-text">Setelah expired, harus buy lagi ke admin</div>
+      </div>
+
+      <button class="btn" id="gasBtn" onclick="gasBadak()">
+        <i class="fa-solid fa-rocket"></i>
+        <span id="btnText">GAS BADAK</span>
+      </button>
+
+      <div class="footer">
+        © 2026 Xzy WA Badak Pro • Expired 24 Jam
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('homePage')">
+      <div class="nav-icon">
+        <i class="fas fa-home"></i>
+      </div>
+      <div class="nav-label">HOME</div>
+    </div>
+    <div class="nav-item" onclick="showPage('badakPage')">
+      <div class="nav-icon">
+        <i class="fab fa-whatsapp"></i>
+      </div>
+      <div class="nav-label">BADAK</div>
+    </div>
+  </div>
+
+  <!-- MODAL SUCCESS -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <i class="fa-solid fa-circle-check"></i>
+        <h2>SUCCESSFULLY BADAK!</h2>
+        <p>Nomor WhatsApp telah ditingkatkan ke level BADAK</p>
+      </div>
+
+      <div class="badak-code">
+        <span id="badakCode">BADAK-7A9F3</span>
+      </div>
+
+      <div class="expiry-info">
+        <i class="fas fa-clock"></i>
+        <span class="expiry-text">AKTIF SELAMA 24 JAM</span>
+      </div>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fa-solid fa-shield-alt"></i>
+          </div>
+          <div class="feature-text">
+            <div class="feature-name">Anti-Block Shield</div>
+            <div class="feature-status">AKTIF</div>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fa-solid fa-infinity"></i>
+          </div>
+          <div class="feature-text">
+            <div class="feature-name">Unlimited Messaging</div>
+            <div class="feature-status">AKTIF</div>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fa-solid fa-server"></i>
+          </div>
+          <div class="feature-text">
+            <div class="feature-name">High Priority Server</div>
+            <div class="feature-status">AKTIF</div>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <div class="feature-text">
+            <div class="feature-name">Spam Protection</div>
+            <div class="feature-status">AKTIF</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-contact">
+        <p>Setelah 24 jam, hubungi admin untuk renew:</p>
+        <a href="https://wa.me/6283803078403" target="_blank">
+          <i class="fab fa-whatsapp"></i>
+          Admin WA Badak
+        </a>
+      </div>
+
+      <button class="modal-btn" onclick="closeModal()">
+        <i class="fa-solid fa-check"></i>
+        OK
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Data storage
+    let badakNumbers = JSON.parse(localStorage.getItem('badakNumbers') || '[]');
+    let expiredNumbers = JSON.parse(localStorage.getItem('expiredNumbers') || '[]');
+    let badakExpiry = JSON.parse(localStorage.getItem('badakExpiry') || '{}');
+
+    // Page Navigation
+    function showPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.container').forEach(page => {
+        page.classList.remove('active');
+      });
+      
+      // Show selected page
+      document.getElementById(pageId).classList.add('active');
+      
+      // Update nav active state
+      document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.classList.remove('active');
+      });
+      
+      // Set active nav based on page
+      if (pageId === 'homePage') {
+        document.querySelectorAll('.nav-item')[0].classList.add('active');
+        updateStats();
+      } else {
+        document.querySelectorAll('.nav-item')[1].classList.add('active');
+        updateExpiredTimer();
+      }
+    }
+
+    // Update statistics
+    function updateStats() {
+      // Hitung total badak aktif
+      const activeBadak = badakNumbers.length;
+      
+      // Hitung total expired
+      const totalExpired = expiredNumbers.length;
+      
+      // Update display
+      document.getElementById('totalBadak').textContent = activeBadak;
+      document.getElementById('totalNonBadak').textContent = totalExpired;
+    }
+
+    // Timer untuk expired badak
+    function updateExpiredTimer() {
+      // Cek apakah ada badak aktif
+      if (badakNumbers.length === 0) {
+        document.getElementById('expiredTimer').textContent = '00:00:00';
+        return;
+      }
+      
+      // Ambil expiry terakhir
+      const lastNumber = badakNumbers[badakNumbers.length - 1];
+      const expiryTime = badakExpiry[lastNumber];
+      
+      if (!expiryTime) {
+        document.getElementById('expiredTimer').textContent = '24:00:00';
+        return;
+      }
+      
+      const now = new Date().getTime();
+      const expiry = new Date(expiryTime).getTime();
+      const remaining = expiry - now;
+      
+      if (remaining <= 0) {
+        // Pindahkan ke expired
+        moveToExpired(lastNumber);
+        updateExpiredTimer();
+        return;
+      }
+      
+      // Format waktu
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      
+      document.getElementById('expiredTimer').textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Pindahkan nomor ke expired
+    function moveToExpired(phone) {
+      const index = badakNumbers.indexOf(phone);
+      if (index > -1) {
+        badakNumbers.splice(index, 1);
+        expiredNumbers.push(phone);
+        delete badakExpiry[phone];
+        
+        localStorage.setItem('badakNumbers', JSON.stringify(badakNumbers));
+        localStorage.setItem('expiredNumbers', JSON.stringify(expiredNumbers));
+        localStorage.setItem('badakExpiry', JSON.stringify(badakExpiry));
+        
+        updateStats();
+      }
+    }
+
+    // Gas Badak function
+    function gasBadak() {
+      const phoneInput = document.getElementById('phone');
+      const btn = document.getElementById('gasBtn');
+      const btnText = document.getElementById('btnText');
+      const phone = phoneInput.value.trim();
+
+      if (btn.disabled) return;
+
+      if (!phone) {
+        btnText.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> NOMOR KOSONG';
+        setTimeout(() => {
+          btnText.innerHTML = 'GAS BADAK';
+        }, 1200);
+        return;
+      }
+
+      // Cek apakah sudah expired
+      if (expiredNumbers.includes(phone)) {
+        btnText.innerHTML = '<i class="fa-solid fa-clock"></i> NOMOR EXPIRED';
+        setTimeout(() => {
+          btnText.innerHTML = 'GAS BADAK';
+        }, 1500);
+        return;
+      }
+
+      // Cek apakah sudah aktif
+      if (badakNumbers.includes(phone)) {
+        btnText.innerHTML = '<i class="fa-solid fa-check"></i> SUDAH BADAK';
+        setTimeout(() => {
+          btnText.innerHTML = 'GAS BADAK';
+        }, 1500);
+        return;
+      }
+
+      btn.disabled = true;
+
+      // Feedback instan
+      btn.classList.add('active');
+      btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROSES BADAK...';
+
+      // Generate random Badak Code
+      const badakCode = 'BADAK-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+      document.getElementById('badakCode').textContent = badakCode;
+
+      setTimeout(() => {
+        btnText.innerHTML = '<i class="fa-solid fa-circle-check"></i> SUCCESSFULLY BADAK';
+        btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+        btn.style.boxShadow = '0 0 30px rgba(34,197,94,0.9)';
+
+        // Simpan ke storage
+        badakNumbers.push(phone);
+        
+        // Set expiry 24 jam dari sekarang
+        const expiryTime = new Date();
+        expiryTime.setHours(expiryTime.getHours() + 24);
+        badakExpiry[phone] = expiryTime.toISOString();
+        
+        // Simpan ke localStorage
+        localStorage.setItem('badakNumbers', JSON.stringify(badakNumbers));
+        localStorage.setItem('badakExpiry', JSON.stringify(badakExpiry));
+        
+        // Update stats
+        updateStats();
+
+        // Tampilkan modal setelah 500ms
+        setTimeout(() => {
+          showModal();
+          
+          // Reset button setelah modal ditutup
+          setTimeout(() => {
+            btn.disabled = false;
+            btnText.innerHTML = 'GAS BADAK';
+            btn.style.background = 'linear-gradient(135deg, #25d366, #00c853)';
+            btn.style.boxShadow = '0 12px 30px rgba(0, 200, 83, 0.45)';
+            phoneInput.value = '';
+          }, 3000);
+        }, 500);
+      }, 600);
+    }
+
+    // Modal functions
+    function showModal() {
+      const modal = document.getElementById('modalOverlay');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('modalOverlay');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal dengan ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // Close modal dengan klik di luar
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modalOverlay')) {
+        closeModal();
+      }
+    });
+
+    // Initialize
+    window.onload = () => {
+      updateStats();
+      
+      // Update timer setiap detik
+      setInterval(() => {
+        updateExpiredTimer();
+      }, 1000);
+      
+      // Auto check expired numbers setiap menit
+      setInterval(() => {
+        const now = new Date().getTime();
+        badakNumbers.forEach(phone => {
+          const expiryTime = new Date(badakExpiry[phone]).getTime();
+          if (expiryTime && now > expiryTime) {
+            moveToExpired(phone);
+          }
+        });
+      }, 60000);
+    };
+  </script>
+</body>
+</html>
