@@ -1,0 +1,2807 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💜 CASHREF - Ultimate Referral System</title>
+    
+    <!-- Firebase SDK 9.22.0 -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Font Awesome 7.0.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========== GLOBAL STYLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            /* Purple Gradient Theme */
+            --primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+            --secondary-gradient: linear-gradient(135deg, #A78BFA 0%, #818CF8 100%);
+            --light-gradient: linear-gradient(135deg, #F3F4F6 0%, #F9FAFB 100%);
+            --dark-gradient: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);
+            
+            /* Colors */
+            --purple-primary: #8B5CF6;
+            --purple-secondary: #6366F1;
+            --purple-light: #C4B5FD;
+            --purple-dark: #3730A3;
+            --white: #FFFFFF;
+            --white-soft: rgba(255, 255, 255, 0.95);
+            --white-glass: rgba(255, 255, 255, 0.15);
+            --black: #1F2937;
+            --gray-light: #F3F4F6;
+            --gray: #6B7280;
+            --gray-dark: #374151;
+            
+            /* Success & Warning */
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-purple: 0 20px 40px rgba(139, 92, 246, 0.3);
+            
+            /* Glass Morphism */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+            min-height: 100vh;
+            color: var(--black);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.8) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ========== TYPOGRAPHY ========== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--black);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: 800;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        small {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        /* ========== GLASS MORPHISM CARD ========== */
+        .glass-card {
+            background: var(--white-soft);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                var(--shadow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+            padding: 1.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                var(--shadow-lg),
+                var(--shadow-purple),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 24px 24px 0 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ========== AUTH PAGES ========== */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            background: var(--light-gradient);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--white);
+            border-radius: 32px;
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+
+        .logo-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 10px 20px rgba(139, 92, 246, 0.3));
+        }
+
+        .logo-header h1 {
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-header p {
+            color: var(--gray);
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-dark);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--white);
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--black);
+            transition: all 0.2s ease;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-input:focus {
+            border-color: var(--purple-primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            background: var(--white);
+        }
+
+        .form-input::placeholder {
+            color: #9CA3AF;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            min-width: 180px;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-purple);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--purple-primary);
+            border: 2px solid var(--purple-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--purple-primary);
+            color: var(--white);
+            border-color: var(--purple-primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: var(--white);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-icon {
+            font-size: 1.25rem;
+        }
+
+        /* ========== AUTH FORMS ========== */
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #E5E7EB;
+            color: var(--gray);
+            font-size: 0.9375rem;
+        }
+
+        .auth-toggle a {
+            color: var(--purple-primary);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .auth-toggle a:hover {
+            color: var(--purple-dark);
+        }
+
+        /* ========== APP CONTAINER ========== */
+        .app-container {
+            display: none;
+            max-width: 480px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+            min-height: 100vh;
+            background: transparent;
+        }
+
+        /* ========== APP HEADER ========== */
+        .app-header {
+            background: var(--primary-gradient);
+            padding: 4rem 1.5rem 1.5rem;
+            border-radius: 0 0 40px 40px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .user-welcome {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-text {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .user-name {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+        }
+
+        .user-email {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* ========== BALANCE CARD ========== */
+        .balance-card {
+            margin: -2.5rem 1.5rem 2rem;
+            position: relative;
+            z-index: 10;
+            background: var(--white);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .balance-label {
+            font-size: 0.875rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .balance-amount {
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .balance-hint {
+            font-size: 0.8125rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .balance-hint i {
+            color: var(--purple-primary);
+        }
+
+        /* ========== STATS GRID ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 0 1.5rem 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--primary-gradient);
+            color: var(--white);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--black);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8125rem;
+            color: var(--gray);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========== GUIDE SECTION ========== */
+        .guide-section {
+            margin: 0 1.5rem 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+            color: var(--purple-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .guide-list {
+            list-style: none;
+        }
+
+        .guide-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid #F3F4F6;
+            color: var(--gray-dark);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            line-height: 1.6;
+        }
+
+        .guide-list li:last-child {
+            border-bottom: none;
+        }
+
+        .guide-list li strong {
+            color: var(--black);
+            font-weight: 700;
+        }
+
+        .guide-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            background: var(--primary-gradient);
+            color: var(--white);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* ========== REFERRAL PAGE ========== */
+        .referral-hero {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: var(--primary-gradient);
+            border-radius: 0 0 40px 40px;
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+
+        .referral-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.2));
+        }
+
+        .referral-hero h2 {
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .referral-hero p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9375rem;
+        }
+
+        .referral-card {
+            margin: 0 1.5rem 2rem;
+        }
+
+        .referral-code-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .referral-label {
+            font-size: 0.875rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .referral-code {
+            background: var(--white);
+            border: 2px dashed var(--purple-light);
+            border-radius: 20px;
+            padding: 1.5rem;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--purple-dark);
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            word-break: break-all;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .referral-code:hover {
+            background: rgba(139, 92, 246, 0.05);
+            border-color: var(--purple-primary);
+            transform: scale(1.02);
+        }
+
+        .referral-hint {
+            font-size: 0.8125rem;
+            color: var(--gray);
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .referral-hint i {
+            color: var(--purple-primary);
+        }
+
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .share-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .share-btn {
+            padding: 1rem;
+            background: var(--white);
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--black);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .share-btn:hover {
+            background: var(--purple-primary);
+            color: var(--white);
+            border-color: var(--purple-primary);
+            transform: translateY(-2px);
+        }
+
+        .share-icon {
+            font-size: 1.5rem;
+        }
+
+        /* ========== WITHDRAWAL PAGE ========== */
+        .withdrawal-hero {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: var(--primary-gradient);
+            border-radius: 0 0 40px 40px;
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+
+        .withdrawal-balance {
+            text-align: center;
+            margin: 2rem 1.5rem;
+        }
+
+        .withdrawal-balance-label {
+            font-size: 0.875rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .withdrawal-amount {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--purple-dark);
+            line-height: 1;
+        }
+
+        .min-withdraw {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin: 0 1.5rem 2rem;
+            text-align: center;
+            color: #92400E;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            border: 2px solid #FBBF24;
+        }
+
+        .withdrawal-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin: 0 1.5rem 2rem;
+        }
+
+        .method-card {
+            padding: 1.25rem 0.75rem;
+            background: var(--white);
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .method-card.active {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--purple-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .method-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--purple-primary);
+        }
+
+        .method-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--black);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .withdrawal-form {
+            margin: 0 1.5rem;
+        }
+
+        .withdrawal-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .amount-input {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            border: none;
+            background: transparent;
+            width: 100%;
+            color: var(--black);
+            padding: 1rem;
+            border-radius: 16px;
+            background: var(--white);
+            border: 2px solid #E5E7EB;
+            transition: all 0.2s ease;
+        }
+
+        .amount-input:focus {
+            outline: none;
+            border-color: var(--purple-primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+
+        .amount-input::placeholder {
+            color: #9CA3AF;
+        }
+
+        /* ========== HISTORY PAGE ========== */
+        .history-hero {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: var(--primary-gradient);
+            border-radius: 0 0 40px 40px;
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+
+        .history-list {
+            margin: 0 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 10px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--purple-light);
+            border-radius: 10px;
+        }
+
+        .history-item {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid #F3F4F6;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .history-method {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .history-amount {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--purple-dark);
+        }
+
+        .history-details {
+            font-size: 0.8125rem;
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .history-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid #F3F4F6;
+        }
+
+        .history-date {
+            font-size: 0.75rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-status {
+            padding: 0.375rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #92400E;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065F46;
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991B1B;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1.5rem;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #E5E7EB;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ========== PROFILE PAGE ========== */
+        .profile-hero {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: var(--primary-gradient);
+            border-radius: 0 0 40px 40px;
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: var(--white);
+            font-weight: 700;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .info-section {
+            margin: 0 1.5rem 2rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #F3F4F6;
+            align-items: center;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 0.9375rem;
+            color: var(--black);
+            font-weight: 600;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+
+        .copy-btn {
+            background: var(--white);
+            border: 2px solid var(--purple-light);
+            color: var(--purple-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 0.75rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn:hover {
+            background: var(--purple-primary);
+            color: var(--white);
+            border-color: var(--purple-primary);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 0 1.5rem 2rem;
+        }
+
+        .password-section {
+            margin: 0 1.5rem 2rem;
+        }
+
+        .logout-section {
+            margin: 0 1.5rem 2rem;
+        }
+
+        /* ========== BOTTOM NAVIGATION ========== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 3rem);
+            max-width: 480px;
+            background: var(--white);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            padding: 0.75rem;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.75rem;
+            cursor: pointer;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item.active {
+            background: var(--primary-gradient);
+            color: var(--white);
+            transform: translateY(-4px);
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--white);
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--white);
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.375rem;
+            color: var(--gray);
+            transition: all 0.3s ease;
+        }
+
+        .nav-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray);
+            transition: all 0.3s ease;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 32px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            animation: fadeInUp 0.4s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #F3F4F6;
+            color: var(--black);
+        }
+
+        /* ========== NOTIFICATION ========== */
+        .notification {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--white);
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 3000;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 320px;
+            border-left: 4px solid var(--purple-primary);
+        }
+
+        .notification.success {
+            border-left-color: var(--success);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning);
+        }
+
+        .notification-icon {
+            font-size: 1.25rem;
+        }
+
+        .notification.success .notification-icon {
+            color: var(--success);
+        }
+
+        .notification.error .notification-icon {
+            color: var(--danger);
+        }
+
+        .notification.warning .notification-icon {
+            color: var(--warning);
+        }
+
+        .notification-message {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--black);
+            line-height: 1.4;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ========== LOADING ========== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(139, 92, 246, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--purple-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+        @media (max-width: 640px) {
+            html {
+                font-size: 14px;
+            }
+
+            .auth-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo-icon {
+                font-size: 3rem;
+            }
+
+            .balance-amount {
+                font-size: 2.5rem;
+            }
+
+            .withdrawal-amount {
+                font-size: 2.5rem;
+            }
+
+            .referral-code {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+
+            .share-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-nav {
+                bottom: 1rem;
+                width: calc(100% - 2rem);
+                padding: 0.5rem;
+            }
+
+            .nav-item {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid,
+            .referral-stats,
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .withdrawal-methods {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .history-amount {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* ========== UTILITY CLASSES ========== */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gradient {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+
+        .hidden {
+            display: none;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <!-- AUTHENTICATION PAGES -->
+    <div id="authPage" class="auth-container">
+        <div class="auth-card">
+            <!-- LOGIN FORM -->
+            <div id="loginForm">
+                <div class="logo-header">
+                    <div class="logo-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h1>CASHREF</h1>
+                    <p>Dapatkan uang dari setiap teman yang bergabung</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••••">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kode Referral (Opsional)</label>
+                    <input type="text" id="referralCode" class="form-input" placeholder="Masukkan kode referral teman">
+                </div>
+
+                <div id="loginError" class="hidden" style="color: var(--danger); font-size: 0.875rem; margin-bottom: 1rem; text-align: center;"></div>
+
+                <button class="btn btn-primary btn-block" onclick="login()" id="loginBtn">
+                    <i class="fas fa-sign-in-alt btn-icon"></i>
+                    <span id="loginBtnText">MASUK KE APLIKASI</span>
+                </button>
+
+                <div class="auth-toggle">
+                    Belum punya akun? <a onclick="showRegister()">Daftar akun baru</a>
+                </div>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="registerForm" class="hidden">
+                <div class="logo-header">
+                    <div class="logo-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h1>DAFTAR AKUN</h1>
+                    <p>Bergabung dan mulai dapatkan komisi!</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="registerEmail" class="form-input" placeholder="you@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="registerPassword" class="form-input" placeholder="Minimal 6 karakter">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Konfirmasi Password</label>
+                    <input type="password" id="registerConfirm" class="form-input" placeholder="Ketik ulang password">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kode Referral (Opsional)</label>
+                    <input type="text" id="registerReferral" class="form-input" placeholder="Masukkan kode referral teman">
+                </div>
+
+                <div id="registerError" class="hidden" style="color: var(--danger); font-size: 0.875rem; margin-bottom: 1rem; text-align: center;"></div>
+
+                <button class="btn btn-secondary btn-block" onclick="register()" id="registerBtn">
+                    <i class="fas fa-user-plus btn-icon"></i>
+                    <span id="registerBtnText">BUAT AKUN BARU</span>
+                </button>
+
+                <div class="auth-toggle">
+                    Sudah punya akun? <a onclick="showLogin()">Masuk disini</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div id="appPage" class="app-container">
+        <!-- HOME PAGE -->
+        <div id="homePage">
+            <div class="app-header">
+                <div class="user-welcome">
+                    <div class="welcome-text">Selamat datang kembali,</div>
+                    <div class="user-name" id="userGreeting">User</div>
+                    <div class="user-email" id="userEmailDisplay">user@example.com</div>
+                </div>
+            </div>
+
+            <div class="balance-card glass-card">
+                <div class="balance-label">Total Saldo Anda</div>
+                <div class="balance-amount" id="userBalance">Rp0</div>
+                <div class="balance-hint">
+                    <i class="fas fa-wallet"></i>
+                    <span>Tarik saldo sekarang</span>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card" onclick="showPage('referralPage')">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-value" id="referralSuccess">0</div>
+                    <div class="stat-label">Referral Berhasil</div>
+                </div>
+
+                <div class="stat-card" onclick="showPage('referralPage')">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-value" id="referralFailed">0</div>
+                    <div class="stat-label">Referral Gagal</div>
+                </div>
+            </div>
+
+            <div class="guide-section glass-card">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="section-title">Panduan Referral</div>
+                </div>
+
+                <ul class="guide-list">
+                    <li>
+                        <div class="guide-number">1</div>
+                        <div>
+                            <strong>Daftar akun</strong> dengan email valid untuk mendapatkan kode referral unik
+                        </div>
+                    </li>
+                    <li>
+                        <div class="guide-number">2</div>
+                        <div>
+                            <strong>Bagikan kode referral</strong> ke teman melalui WhatsApp, Telegram, atau media sosial
+                        </div>
+                    </li>
+                    <li>
+                        <div class="guide-number">3</div>
+                        <div>
+                            Dapatkan <strong>Rp250</strong> untuk setiap teman yang berhasil mendaftar menggunakan kode Anda
+                        </div>
+                    </li>
+                    <li>
+                        <div class="guide-number">4</div>
+                        <div>
+                            Teman Anda juga mendapatkan <strong>bonus Rp100</strong> saat mendaftar
+                        </div>
+                    </li>
+                    <li>
+                        <div class="guide-number">5</div>
+                        <div>
+                            <strong>Tarik saldo</strong> kapan saja melalui DANA, ShopeePay, atau transfer bank
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- REFERRAL PAGE -->
+        <div id="referralPage" class="hidden">
+            <div class="referral-hero">
+                <div class="referral-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <h2>Program Referral</h2>
+                <p>Dapatkan komisi untuk setiap teman yang bergabung</p>
+            </div>
+
+            <div class="referral-card glass-card">
+                <div class="referral-code-container">
+                    <div class="referral-label">Kode Referral Anda</div>
+                    <div class="referral-code" id="referralCodeDisplay" onclick="copyReferralCode()">
+                        LOADING...
+                    </div>
+                    <div class="referral-hint">
+                        <i class="fas fa-mouse-pointer"></i>
+                        Klik untuk menyalin kode
+                    </div>
+                </div>
+
+                <div class="referral-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-value" id="referralSuccessPage">0</div>
+                        <div class="stat-label">Berhasil</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-value" id="referralFailedPage">0</div>
+                        <div class="stat-label">Gagal</div>
+                    </div>
+                </div>
+
+                <div class="section-header mb-3">
+                    <div class="section-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="section-title">Bagikan Referral</div>
+                </div>
+
+                <div class="share-actions">
+                    <button class="share-btn" onclick="shareViaWhatsApp()">
+                        <i class="fab fa-whatsapp share-icon"></i>
+                        WhatsApp
+                    </button>
+                    <button class="share-btn" onclick="shareViaTelegram()">
+                        <i class="fab fa-telegram share-icon"></i>
+                        Telegram
+                    </button>
+                    <button class="share-btn" onclick="copyReferralLink()">
+                        <i class="fas fa-link share-icon"></i>
+                        Salin Link
+                    </button>
+                </div>
+            </div>
+
+            <div class="guide-section glass-card">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="section-title">Tips Sukses Referral</div>
+                </div>
+
+                <ul class="guide-list">
+                    <li>
+                        <div class="guide-number">💬</div>
+                        <div>Bagikan link referral ke grup WhatsApp atau komunitas online</div>
+                    </li>
+                    <li>
+                        <div class="guide-number">📱</div>
+                        <div>Posting di story Instagram dengan hashtag dan ajakan menarik</div>
+                    </li>
+                    <li>
+                        <div class="guide-number">👥</div>
+                        <div>Ajak teman dekat dan keluarga untuk bergabung</div>
+                    </li>
+                    <li>
+                        <div class="guide-number">💰</div>
+                        <div>Setiap referral sukses = <strong>Rp250</strong> untuk Anda!</div>
+                    </li>
+                    <li>
+                        <div class="guide-number">🎁</div>
+                        <div>Bonus <strong>Rp100</strong> untuk teman yang baru daftar</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- WITHDRAWAL PAGE -->
+        <div id="withdrawPage" class="hidden">
+            <div class="withdrawal-hero">
+                <h2>Tarik Dana</h2>
+                <p>Tarik pendapatan Anda ke e-wallet pilihan</p>
+            </div>
+
+            <div class="withdrawal-balance">
+                <div class="withdrawal-balance-label">Saldo Tersedia</div>
+                <div class="withdrawal-amount" id="withdrawBalance">Rp0</div>
+            </div>
+
+            <div class="min-withdraw">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Minimal penarikan: <strong>Rp10.000</strong></span>
+            </div>
+
+            <div class="glass-card">
+                <div class="section-header mb-3">
+                    <div class="section-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="section-title">Pilih Metode Penarikan</div>
+                </div>
+
+                <div class="withdrawal-methods">
+                    <div class="method-card" onclick="selectWithdrawMethod('dana')" id="methodDana">
+                        <div class="method-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="method-name">DANA</div>
+                    </div>
+
+                    <div class="method-card" onclick="selectWithdrawMethod('shopee')" id="methodShopee">
+                        <div class="method-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="method-name">SHOPEE PAY</div>
+                    </div>
+
+                    <div class="method-card" onclick="selectWithdrawMethod('bank')" id="methodBank">
+                        <div class="method-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="method-name">BANK</div>
+                    </div>
+                </div>
+
+                <!-- Dana Form -->
+                <div id="danaForm" class="hidden mt-3">
+                    <div class="form-group">
+                        <label class="form-label">Nomor DANA</label>
+                        <input type="number" id="danaNumber" class="form-input" placeholder="0812xxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nama Pemilik DANA</label>
+                        <input type="text" id="danaName" class="form-input" placeholder="Nama sesuai di DANA">
+                    </div>
+                </div>
+
+                <!-- Shopee Form -->
+                <div id="shopeeForm" class="hidden mt-3">
+                    <div class="form-group">
+                        <label class="form-label">Nomor ShopeePay</label>
+                        <input type="number" id="shopeeNumber" class="form-input" placeholder="0812xxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nama Pemilik ShopeePay</label>
+                        <input type="text" id="shopeeName" class="form-input" placeholder="Nama sesuai di Shopee">
+                    </div>
+                </div>
+
+                <!-- Bank Form -->
+                <div id="bankForm" class="hidden mt-3">
+                    <div class="form-group">
+                        <label class="form-label">Nama Bank</label>
+                        <select id="bankName" class="form-input">
+                            <option value="">Pilih Bank</option>
+                            <option value="BCA">BCA</option>
+                            <option value="BRI">BRI</option>
+                            <option value="BNI">BNI</option>
+                            <option value="Mandiri">Mandiri</option>
+                            <option value="CIMB">CIMB</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nomor Rekening</label>
+                        <input type="number" id="bankNumber" class="form-input" placeholder="1234567890">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nama Pemilik Rekening</label>
+                        <input type="text" id="bankAccountName" class="form-input" placeholder="Nama sesuai di rekening">
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="form-label">Jumlah Penarikan (Rp)</label>
+                    <input type="number" id="withdrawAmount" class="amount-input" placeholder="10000">
+                </div>
+
+                <div id="withdrawError" class="hidden mt-3" style="color: var(--danger); font-size: 0.875rem; text-align: center;"></div>
+                <div id="withdrawSuccess" class="hidden mt-3" style="color: var(--success); font-size: 0.875rem; text-align: center;"></div>
+
+                <button class="btn btn-success btn-block mt-4" onclick="submitWithdraw()" id="withdrawBtn">
+                    <i class="fas fa-paper-plane btn-icon"></i>
+                    TARIK SEKARANG
+                </button>
+            </div>
+        </div>
+
+        <!-- HISTORY PAGE -->
+        <div id="historyPage" class="hidden">
+            <div class="history-hero">
+                <h2>Riwayat Penarikan</h2>
+                <p>Lihat semua transaksi penarikan Anda</p>
+            </div>
+
+            <div class="history-list" id="withdrawalHistory">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h3>Belum ada riwayat</h3>
+                    <p>Anda belum melakukan penarikan dana</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE PAGE -->
+        <div id="profilePage" class="hidden">
+            <div class="profile-hero">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <h2>Profil Akun</h2>
+                <p>Kelola informasi dan pengaturan akun</p>
+            </div>
+
+            <div class="info-section glass-card">
+                <div class="section-header mb-3">
+                    <div class="section-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="section-title">Informasi Akun</div>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value" id="profileEmail">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">User ID</span>
+                    <div class="flex items-center">
+                        <span class="info-value" id="profileUserId" style="font-family: monospace; font-size: 0.75rem;">-</span>
+                        <button class="copy-btn" onclick="copyUserId()">
+                            <i class="fas fa-copy"></i> Salin
+                        </button>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tanggal Bergabung</span>
+                    <span class="info-value" id="profileJoinDate">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status Akun</span>
+                    <span class="info-value" style="color: var(--success);" id="profileStatus">Aktif</span>
+                </div>
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value" id="profileReferralSuccess">0</div>
+                    <div class="stat-label">Total Referral</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value" id="profileTotalEarned">Rp0</div>
+                    <div class="stat-label">Total Pendapatan</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-value" id="profileCurrentBalance">Rp0</div>
+                    <div class="stat-label">Saldo Saat Ini</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <div class="stat-value" id="profileTotalWithdrawn">Rp0</div>
+                    <div class="stat-label">Total Ditarik</div>
+                </div>
+            </div>
+
+            <div class="password-section glass-card">
+                <div class="section-header mb-3">
+                    <div class="section-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="section-title">Ganti Password</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password Lama</label>
+                    <input type="password" id="oldPassword" class="form-input" placeholder="Masukkan password lama">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password Baru</label>
+                    <input type="password" id="newPassword" class="form-input" placeholder="Minimal 6 karakter">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirmNewPassword" class="form-input" placeholder="Ketik ulang password baru">
+                </div>
+
+                <div id="passwordError" class="hidden" style="color: var(--danger); font-size: 0.875rem; margin-bottom: 1rem; text-align: center;"></div>
+                <div id="passwordSuccess" class="hidden" style="color: var(--success); font-size: 0.875rem; margin-bottom: 1rem; text-align: center;"></div>
+
+                <button class="btn btn-primary btn-block" onclick="changePassword()">
+                    <i class="fas fa-sync-alt btn-icon"></i>
+                    GANTI PASSWORD
+                </button>
+            </div>
+
+            <div class="logout-section glass-card">
+                <button class="btn btn-danger btn-block" onclick="logout()">
+                    <i class="fas fa-sign-out-alt btn-icon"></i>
+                    KELUAR DARI AKUN
+                </button>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('homePage')">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">HOME</span>
+            </div>
+            <div class="nav-item" onclick="showPage('referralPage')">
+                <i class="fas fa-user-friends nav-icon"></i>
+                <span class="nav-label">REFERRAL</span>
+            </div>
+            <div class="nav-item" onclick="showPage('withdrawPage')">
+                <i class="fas fa-wallet nav-icon"></i>
+                <span class="nav-label">TARIK</span>
+            </div>
+            <div class="nav-item" onclick="showPage('historyPage')">
+                <i class="fas fa-history nav-icon"></i>
+                <span class="nav-label">RIWAYAT</span>
+            </div>
+            <div class="nav-item" onclick="showPage('profilePage')">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">PROFILE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE MODAL -->
+    <div id="shareModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-share-alt"></i>
+                    Bagikan Referral
+                </div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Link Referral Anda</label>
+                <input type="text" id="shareableLink" class="form-input" readonly>
+            </div>
+            
+            <button class="btn btn-primary btn-block mt-3" onclick="copyShareLink()">
+                <i class="fas fa-copy btn-icon"></i>
+                SALIN LINK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 🔥 FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyCf230zCliSZ9EYLByMnmflqw8sOz328Uc",
+            authDomain: "database-cupz.firebaseapp.com",
+            projectId: "database-cupz",
+            storageBucket: "database-cupz.firebasestorage.app",
+            messagingSenderId: "343357519412",
+            appId: "1:343357519412:web:dce862636c7c459e6a3c61"
+        };
+
+        // Initialize Firebase
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log("✅ Firebase initialized successfully");
+            }
+        } catch (error) {
+            console.error("❌ Firebase initialization error:", error);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // 🔥 APPLICATION STATE
+        let currentUser = null;
+        let userData = {};
+        let userBalance = 0;
+        let referralCode = '';
+        let selectedWithdrawMethod = null;
+        let realTimeListener = null;
+
+        // 🔥 UTILITY FUNCTIONS
+        function formatRupiah(amount) {
+            if (!amount) return 'Rp0';
+            return 'Rp' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function showNotification(type, message) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} notification-icon"></i>
+                <div class="notification-message">${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function setLoading(button, isLoading) {
+            if (isLoading) {
+                button.innerHTML = '<div class="loading"></div>';
+                button.disabled = true;
+            } else {
+                const btnText = button.getAttribute('data-original-text') || button.textContent;
+                button.textContent = btnText;
+                button.disabled = false;
+            }
+        }
+
+        // 🔥 AUTHENTICATION FUNCTIONS
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const refCode = document.getElementById('referralCode').value.trim();
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+
+            // Validation
+            if (!email || !password) {
+                errorDiv.textContent = 'Email dan password harus diisi';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            setLoading(btn, true);
+            errorDiv.classList.add('hidden');
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                
+                // Process referral code if provided
+                if (refCode) {
+                    await processReferral(refCode);
+                }
+
+                await loadUserData();
+                showApp();
+                
+            } catch (error) {
+                errorDiv.textContent = getErrorMessage(error.code);
+                errorDiv.classList.remove('hidden');
+                console.error('Login error:', error);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
+            const confirm = document.getElementById('registerConfirm').value.trim();
+            const refCode = document.getElementById('registerReferral').value.trim();
+            const btn = document.getElementById('registerBtn');
+            const errorDiv = document.getElementById('registerError');
+
+            // Validation
+            if (!email || !password || !confirm) {
+                errorDiv.textContent = 'Semua field harus diisi';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (password.length < 6) {
+                errorDiv.textContent = 'Password minimal 6 karakter';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (password !== confirm) {
+                errorDiv.textContent = 'Password tidak cocok';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            setLoading(btn, true);
+            errorDiv.classList.add('hidden');
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                
+                // Generate unique referral code
+                const newRefCode = generateReferralCode();
+                
+                // Create user document
+                await db.collection('users').doc(currentUser.uid).set({
+                    email: email,
+                    referralCode: newRefCode,
+                    balance: 0,
+                    referralSuccess: 0,
+                    referralFailed: 0,
+                    totalEarned: 0,
+                    totalWithdrawn: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active',
+                    hasUsedReferral: false
+                });
+
+                // Process referral code if provided
+                if (refCode) {
+                    await processReferral(refCode);
+                }
+
+                await loadUserData();
+                showApp();
+                
+                showNotification('success', 'Akun berhasil dibuat!');
+                
+            } catch (error) {
+                errorDiv.textContent = getErrorMessage(error.code);
+                errorDiv.classList.remove('hidden');
+                console.error('Register error:', error);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        function getErrorMessage(errorCode) {
+            const messages = {
+                'auth/invalid-email': 'Email tidak valid',
+                'auth/user-disabled': 'Akun dinonaktifkan',
+                'auth/user-not-found': 'Akun tidak ditemukan',
+                'auth/wrong-password': 'Password salah',
+                'auth/email-already-in-use': 'Email sudah terdaftar',
+                'auth/weak-password': 'Password terlalu lemah',
+                'auth/network-request-failed': 'Koneksi internet bermasalah',
+                'auth/too-many-requests': 'Terlalu banyak percobaan. Coba lagi nanti'
+            };
+            return messages[errorCode] || 'Terjadi kesalahan. Silakan coba lagi';
+        }
+
+        // 🔥 REFERRAL SYSTEM
+        function generateReferralCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        async function processReferral(refCode) {
+            try {
+                if (!currentUser) return;
+
+                // Check if user has already used a referral code
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists && userDoc.data().hasUsedReferral) {
+                    return;
+                }
+
+                // Find referrer by referral code
+                const usersRef = db.collection('users');
+                const querySnapshot = await usersRef.where('referralCode', '==', refCode.toUpperCase()).get();
+                
+                if (querySnapshot.empty) {
+                    console.log('Referral code not found');
+                    return;
+                }
+
+                const referrerDoc = querySnapshot.docs[0];
+                const referrerId = referrerDoc.id;
+                const referrerData = referrerDoc.data();
+
+                // Prevent self-referral
+                if (referrerId === currentUser.uid) {
+                    console.log('Self-referral attempt blocked');
+                    return;
+                }
+
+                // Referral bonuses
+                const referrerBonus = 250;
+                const referredBonus = 100;
+
+                // Update referrer data
+                await db.collection('users').doc(referrerId).update({
+                    balance: firebase.firestore.FieldValue.increment(referrerBonus),
+                    referralSuccess: firebase.firestore.FieldValue.increment(1),
+                    totalEarned: firebase.firestore.FieldValue.increment(referrerBonus),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update current user
+                await db.collection('users').doc(currentUser.uid).update({
+                    balance: firebase.firestore.FieldValue.increment(referredBonus),
+                    hasUsedReferral: true,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Log the referral
+                await db.collection('referrals').add({
+                    referrerId: referrerId,
+                    referredId: currentUser.uid,
+                    referrerEmail: referrerData.email,
+                    referredEmail: currentUser.email,
+                    referrerBonus: referrerBonus,
+                    referredBonus: referredBonus,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'success'
+                });
+
+                showNotification('success', `Bonus referral berhasil! +Rp${referredBonus}`);
+                
+            } catch (error) {
+                console.error('Referral processing error:', error);
+            }
+        }
+
+        // 🔥 APPLICATION FUNCTIONS
+        function showApp() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('appPage').style.display = 'block';
+            
+            updateUserDisplay();
+            setupRealtimeListener();
+            loadWithdrawalHistory();
+        }
+
+        async function loadUserData() {
+            if (!currentUser) return;
+
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    userData = userDoc.data();
+                    userBalance = userData.balance || 0;
+                    referralCode = userData.referralCode || '';
+                    
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('Load user data error:', error);
+            }
+        }
+
+        function setupRealtimeListener() {
+            if (!currentUser) return;
+
+            // Remove existing listener
+            if (realTimeListener) {
+                realTimeListener();
+            }
+
+            // Listen for user data changes
+            realTimeListener = db.collection('users').doc(currentUser.uid)
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        userData = doc.data();
+                        userBalance = userData.balance || 0;
+                        updateUI();
+                    }
+                }, (error) => {
+                    console.error('Realtime listener error:', error);
+                });
+
+            // Listen for withdrawal status changes
+            db.collection('withdrawals')
+                .where('userId', '==', currentUser.uid)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot((snapshot) => {
+                    loadWithdrawalHistory();
+                }, (error) => {
+                    console.error('Withdrawal listener error:', error);
+                });
+        }
+
+        function updateUI() {
+            if (!currentUser) return;
+
+            // Update balance displays
+            document.getElementById('userBalance').textContent = formatRupiah(userBalance);
+            document.getElementById('withdrawBalance').textContent = formatRupiah(userBalance);
+            document.getElementById('profileCurrentBalance').textContent = formatRupiah(userBalance);
+            
+            // Update earnings and withdrawals
+            document.getElementById('profileTotalEarned').textContent = formatRupiah(userData.totalEarned || 0);
+            document.getElementById('profileTotalWithdrawn').textContent = formatRupiah(userData.totalWithdrawn || 0);
+            
+            // Update referral stats
+            document.getElementById('referralSuccess').textContent = userData.referralSuccess || 0;
+            document.getElementById('referralFailed').textContent = userData.referralFailed || 0;
+            document.getElementById('referralSuccessPage').textContent = userData.referralSuccess || 0;
+            document.getElementById('referralFailedPage').textContent = userData.referralFailed || 0;
+            document.getElementById('profileReferralSuccess').textContent = userData.referralSuccess || 0;
+            
+            // Update referral code
+            if (referralCode) {
+                document.getElementById('referralCodeDisplay').textContent = referralCode;
+            }
+        }
+
+        function updateUserDisplay() {
+            if (!currentUser) return;
+            
+            const email = currentUser.email;
+            const name = email.split('@')[0];
+            
+            // Update greetings and profile
+            document.getElementById('userGreeting').textContent = name;
+            document.getElementById('userEmailDisplay').textContent = email;
+            document.getElementById('profileEmail').textContent = email;
+            document.getElementById('profileUserId').textContent = currentUser.uid;
+            
+            // Update profile avatar
+            document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
+            
+            // Update join date
+            if (userData.createdAt) {
+                const date = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date();
+                document.getElementById('profileJoinDate').textContent = date.toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+        }
+
+        // 🔥 WITHDRAWAL FUNCTIONS
+        function selectWithdrawMethod(method) {
+            selectedWithdrawMethod = method;
+            
+            // Reset all method cards
+            document.getElementById('methodDana').classList.remove('active');
+            document.getElementById('methodShopee').classList.remove('active');
+            document.getElementById('methodBank').classList.remove('active');
+            
+            // Hide all forms
+            document.getElementById('danaForm').classList.add('hidden');
+            document.getElementById('shopeeForm').classList.add('hidden');
+            document.getElementById('bankForm').classList.add('hidden');
+            
+            // Activate selected method
+            document.getElementById(`method${method.charAt(0).toUpperCase() + method.slice(1)}`).classList.add('active');
+            
+            // Show selected form
+            if (method === 'dana') {
+                document.getElementById('danaForm').classList.remove('hidden');
+            } else if (method === 'shopee') {
+                document.getElementById('shopeeForm').classList.remove('hidden');
+            } else if (method === 'bank') {
+                document.getElementById('bankForm').classList.remove('hidden');
+            }
+        }
+
+        async function submitWithdraw() {
+            if (!currentUser) {
+                showNotification('error', 'Silakan login terlebih dahulu');
+                return;
+            }
+
+            if (!selectedWithdrawMethod) {
+                showNotification('error', 'Pilih metode penarikan terlebih dahulu');
+                return;
+            }
+
+            const amountInput = document.getElementById('withdrawAmount').value.trim();
+            const amount = parseInt(amountInput);
+
+            // Validation
+            if (!amount || isNaN(amount) || amount < 10000) {
+                showNotification('error', 'Minimal penarikan Rp10.000');
+                return;
+            }
+
+            if (amount > userBalance) {
+                showNotification('error', 'Saldo tidak mencukupi');
+                return;
+            }
+
+            // Collect withdrawal data
+            let withdrawData = {
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                amount: amount,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'pending',
+                adminApproved: false,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Add method-specific data
+            if (selectedWithdrawMethod === 'dana') {
+                const danaNumber = document.getElementById('danaNumber').value.trim();
+                const danaName = document.getElementById('danaName').value.trim();
+                
+                if (!danaNumber || !danaName) {
+                    showNotification('error', 'Isi semua data DANA');
+                    return;
+                }
+                
+                withdrawData.method = 'DANA';
+                withdrawData.accountNumber = danaNumber;
+                withdrawData.accountName = danaName;
+            }
+            else if (selectedWithdrawMethod === 'shopee') {
+                const shopeeNumber = document.getElementById('shopeeNumber').value.trim();
+                const shopeeName = document.getElementById('shopeeName').value.trim();
+                
+                if (!shopeeNumber || !shopeeName) {
+                    showNotification('error', 'Isi semua data ShopeePay');
+                    return;
+                }
+                
+                withdrawData.method = 'SHOPEE PAY';
+                withdrawData.accountNumber = shopeeNumber;
+                withdrawData.accountName = shopeeName;
+            }
+            else if (selectedWithdrawMethod === 'bank') {
+                const bankName = document.getElementById('bankName').value;
+                const bankNumber = document.getElementById('bankNumber').value.trim();
+                const bankAccountName = document.getElementById('bankAccountName').value.trim();
+                
+                if (!bankName || !bankNumber || !bankAccountName) {
+                    showNotification('error', 'Isi semua data bank');
+                    return;
+                }
+                
+                withdrawData.method = bankName;
+                withdrawData.accountNumber = bankNumber;
+                withdrawData.accountName = bankAccountName;
+                withdrawData.bankName = bankName;
+            }
+
+            const btn = document.getElementById('withdrawBtn');
+            const originalText = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<div class="loading"></div>';
+            btn.disabled = true;
+
+            try {
+                // Create withdrawal request
+                const withdrawRef = await db.collection('withdrawals').add(withdrawData);
+                const withdrawalId = withdrawRef.id;
+                
+                // Update user balance
+                await db.collection('users').doc(currentUser.uid).update({
+                    balance: firebase.firestore.FieldValue.increment(-amount),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update local balance
+                userBalance -= amount;
+                updateUI();
+
+                // Send notification to admin bot (in production, this would be a webhook)
+                await notifyAdminBot(withdrawalId, withdrawData);
+
+                // Reset form
+                resetWithdrawForm();
+
+                showNotification('success', 
+                    `✅ Penarikan berhasil diajukan!\n` +
+                    `💰 Rp${amount.toLocaleString('id-ID')}\n` +
+                    `📱 Akan diproses dalam 1x24 jam`
+                );
+
+                // Reload history
+                loadWithdrawalHistory();
+
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                showNotification('error', 'Gagal mengajukan penarikan');
+            } finally {
+                // Reset button state
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function resetWithdrawForm() {
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('danaNumber').value = '';
+            document.getElementById('danaName').value = '';
+            document.getElementById('shopeeNumber').value = '';
+            document.getElementById('shopeeName').value = '';
+            document.getElementById('bankName').value = '';
+            document.getElementById('bankNumber').value = '';
+            document.getElementById('bankAccountName').value = '';
+            
+            selectedWithdrawMethod = null;
+            document.getElementById('methodDana').classList.remove('active');
+            document.getElementById('methodShopee').classList.remove('active');
+            document.getElementById('methodBank').classList.remove('active');
+            
+            document.getElementById('danaForm').classList.add('hidden');
+            document.getElementById('shopeeForm').classList.add('hidden');
+            document.getElementById('bankForm').classList.add('hidden');
+        }
+
+        async function notifyAdminBot(withdrawalId, withdrawData) {
+            try {
+                // In production, this would send to your Telegram bot webhook
+                const message = `
+🆕 PENARIKAN BARU
+━━━━━━━━━━━━━━
+👤 User: ${withdrawData.userEmail}
+💰 Amount: Rp${withdrawData.amount.toLocaleString('id-ID')}
+📱 Method: ${withdrawData.method}
+🏦 Account: ${withdrawData.accountNumber}
+👤 Name: ${withdrawData.accountName}
+🆔 ID: ${withdrawalId}
+⏰ Time: ${new Date().toLocaleString('id-ID')}
+━━━━━━━━━━━━━━
+                `;
+                
+                console.log('📤 Admin notification:', message);
+                // Implement Telegram Bot API call here
+                
+            } catch (error) {
+                console.error('Admin notification error:', error);
+            }
+        }
+
+        async function loadWithdrawalHistory() {
+            if (!currentUser) return;
+
+            try {
+                const historyContainer = document.getElementById('withdrawalHistory');
+                const snapshot = await db.collection('withdrawals')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    historyContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <h3>Belum ada riwayat</h3>
+                            <p>Anda belum melakukan penarikan dana</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.timestamp?.toDate() || new Date();
+                    const formattedDate = date.toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                    const formattedTime = date.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    let statusClass = 'status-pending';
+                    let statusText = 'PENDING';
+
+                    if (data.status === 'approved' || data.adminApproved === true) {
+                        statusClass = 'status-success';
+                        statusText = 'SUCCESS';
+                    } else if (data.status === 'rejected') {
+                        statusClass = 'status-rejected';
+                        statusText = 'REJECTED';
+                    }
+
+                    html += `
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-method">${data.method || 'Unknown'}</div>
+                                <div class="history-amount">Rp${data.amount?.toLocaleString('id-ID') || '0'}</div>
+                            </div>
+                            <div class="history-details">
+                                ${data.accountNumber || ''} - ${data.accountName || ''}
+                            </div>
+                            <div class="history-footer">
+                                <div class="history-date">
+                                    <i class="far fa-calendar"></i>
+                                    ${formattedDate} ${formattedTime}
+                                </div>
+                                <div class="history-status ${statusClass}">${statusText}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                historyContainer.innerHTML = html;
+
+            } catch (error) {
+                console.error('Load withdrawal history error:', error);
+                historyContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Gagal memuat data</h3>
+                        <p>Silakan coba lagi nanti</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 🔥 PROFILE FUNCTIONS
+        function copyUserId() {
+            if (!currentUser) return;
+            
+            navigator.clipboard.writeText(currentUser.uid).then(() => {
+                showNotification('success', 'User ID berhasil disalin');
+            }).catch(() => {
+                showNotification('error', 'Gagal menyalin User ID');
+            });
+        }
+
+        async function changePassword() {
+            const oldPassword = document.getElementById('oldPassword').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmNewPassword').value.trim();
+            const errorDiv = document.getElementById('passwordError');
+            const successDiv = document.getElementById('passwordSuccess');
+
+            // Validation
+            if (!oldPassword || !newPassword || !confirmPassword) {
+                errorDiv.textContent = 'Semua field harus diisi';
+                errorDiv.classList.remove('hidden');
+                successDiv.classList.add('hidden');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                errorDiv.textContent = 'Password baru minimal 6 karakter';
+                errorDiv.classList.remove('hidden');
+                successDiv.classList.add('hidden');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                errorDiv.textContent = 'Password baru tidak cocok';
+                errorDiv.classList.remove('hidden');
+                successDiv.classList.add('hidden');
+                return;
+            }
+
+            try {
+                // Reauthenticate user
+                const credential = firebase.auth.EmailAuthProvider.credential(
+                    currentUser.email,
+                    oldPassword
+                );
+                
+                await currentUser.reauthenticateWithCredential(credential);
+                
+                // Update password
+                await currentUser.updatePassword(newPassword);
+                
+                // Show success message
+                successDiv.textContent = 'Password berhasil diubah!';
+                successDiv.classList.remove('hidden');
+                errorDiv.classList.add('hidden');
+                
+                // Clear fields
+                document.getElementById('oldPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmNewPassword').value = '';
+                
+                showNotification('success', 'Password berhasil diubah');
+                
+            } catch (error) {
+                errorDiv.textContent = getErrorMessage(error.code) || 'Gagal mengubah password';
+                errorDiv.classList.remove('hidden');
+                successDiv.classList.add('hidden');
+            }
+        }
+
+        async function logout() {
+            try {
+                // Remove realtime listener
+                if (realTimeListener) {
+                    realTimeListener();
+                    realTimeListener = null;
+                }
+
+                // Sign out
+                await auth.signOut();
+                
+                // Reset state
+                currentUser = null;
+                userData = {};
+                userBalance = 0;
+                referralCode = '';
+                
+                // Show auth page
+                document.getElementById('appPage').style.display = 'none';
+                document.getElementById('authPage').style.display = 'flex';
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+                
+                // Clear form fields
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('referralCode').value = '';
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                showNotification('error', 'Gagal logout');
+            }
+        }
+
+        // 🔥 SHARE FUNCTIONS
+        function copyReferralCode() {
+            if (!referralCode) return;
+            
+            navigator.clipboard.writeText(referralCode).then(() => {
+                const codeElement = document.getElementById('referralCodeDisplay');
+                const originalText = codeElement.textContent;
+                
+                codeElement.textContent = '✅ COPIED!';
+                setTimeout(() => {
+                    codeElement.textContent = originalText;
+                }, 2000);
+                
+                showNotification('success', 'Kode referral berhasil disalin');
+            }).catch(() => {
+                showNotification('error', 'Gagal menyalin kode');
+            });
+        }
+
+        function shareViaWhatsApp() {
+            if (!referralCode) return;
+            
+            const text = `Halo! Bergabunglah dengan CASHREF menggunakan kode referral saya: ${referralCode}\n\nDapatkan bonus Rp100 saat mendaftar dan mulai dapatkan uang dari referral!`;
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareViaTelegram() {
+            if (!referralCode) return;
+            
+            const text = `Halo! Bergabunglah dengan CASHREF menggunakan kode referral saya: ${referralCode}\n\nDapatkan bonus Rp100 saat mendaftar dan mulai dapatkan uang dari referral!`;
+            const url = `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function copyReferralLink() {
+            if (!referralCode) return;
+            
+            const link = `${window.location.origin}?ref=${referralCode}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showNotification('success', 'Link referral berhasil disalin');
+            }).catch(() => {
+                showNotification('error', 'Gagal menyalin link');
+            });
+        }
+
+        function openShareModal() {
+            if (!referralCode) return;
+            
+            const link = `${window.location.origin}?ref=${referralCode}`;
+            document.getElementById('shareableLink').value = link;
+            document.getElementById('shareModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('shareModal').style.display = 'none';
+        }
+
+        // 🔥 PAGE NAVIGATION
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = ['homePage', 'referralPage', 'withdrawPage', 'historyPage', 'profilePage'];
+            pages.forEach(page => {
+                document.getElementById(page).classList.add('hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Activate corresponding nav item
+            const pageIndex = pages.indexOf(pageId);
+            if (pageIndex !== -1) {
+                navItems[pageIndex].classList.add('active');
+            }
+            
+            // Load data for specific pages
+            if (pageId === 'historyPage') {
+                loadWithdrawalHistory();
+            }
+        }
+
+        // 🔥 INITIALIZATION
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                loadUserData().then(() => {
+                    showApp();
+                }).catch(error => {
+                    console.error('Auth state change error:', error);
+                });
+            }
+        });
+
+        // Auto-check for referral code in URL
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('💜 CASHREF System Ready');
+            
+            // Check for referral code in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            
+            if (refCode) {
+                document.getElementById('referralCode').value = refCode;
+                document.getElementById('registerReferral').value = refCode;
+                
+                // Store for later use
+                localStorage.setItem('pendingReferral', refCode);
+            }
+        });
+    </script>
+</body>
+</html>
