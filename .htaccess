@@ -1,0 +1,19 @@
+RewriteEngine On
+
+# Redirect root to home
+RewriteRule ^$ /home [R=301,L]
+
+# Remove .html extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [NC,L]
+
+# Custom routes
+RewriteRule ^home$ index.html [NC,L]
+RewriteRule ^referral$ referral.html [NC,L]
+RewriteRule ^withdraw$ withdraw.html [NC,L]
+RewriteRule ^riwayat$ riwayat.html [NC,L]
+RewriteRule ^profile$ profile.html [NC,L]
+
+# Handle 404
+ErrorDocument 404 /home
